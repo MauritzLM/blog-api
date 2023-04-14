@@ -2,35 +2,40 @@ const express = require('express');
 const router = express.Router();
 
 // controllers
+const indexController = require('../controllers/indexController');
+const postController = require('../controllers/postController');
 
 // Homepage
-router.get('/')
+router.get('/', indexController.homepageGet);
 
 // POSTS
 //GET all posts
-router.get('/posts')
+router.get('/posts', postController.getAllPosts);
 
-//GET specific post
-router.get('/posts/:postid')
+// GET specific post
+router.get('/posts/:postid', postController.getOnePost);
 
-//Create post
-router.post('/posts')
+// Create post
+router.post('/posts', postController.createNewPost);
 
-//Update post
-router.put('/posts/:postid')
+// Update post
+router.put('/posts/:postid', postController.updatePost);
 
 //Delete post
-router.delete('/posts/:postid')
+router.delete('/posts/:postid', postController.deletePost);
 
-//COMMENTS
+// COMMENTS
 // GET specific comment
-router.get('posts/:postid/:commentid')
+router.get('posts/:postid/comments/:commentid', postController.getComment);
 
 // create new comment
-router.post('/posts/:postid')
+router.post('/posts/:postid', postController.createNewComment);
 
 // edit comment
-router.put('posts/:postid/:commentid')
+router.put('posts/:postid/:commentid', postController.updateComment);
 
 // delete comment
-router.delete('posts/:postid/:commentid')
+router.delete('posts/:postid/:commentid', postController.deleteComment);
+
+// export router
+module.exports = router;
