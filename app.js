@@ -1,22 +1,27 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
+
+// routes
+const routes = require('./routes/routes');
 
 require('dotenv').config()
-// mongoose.set("strictQuery", false);
-// const mongoDB = process.env.MONGODB;
+// Connect DB
+mongoose.set("strictQuery", false);
+const mongoDB = process.env.MONGODB;
 
-// main().catch(err => console.log(err));
+main().catch(err => console.log(err));
 
-// async function main() {
-//     await mongoose.connect(mongoDB);
-// }
+async function main() {
+    await mongoose.connect(mongoDB);
+}
 
-// const db = mongoose.connection;
-// db.on("error", console.error.bind(console, "mongo connection error"));
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "mongo connection error"));
 
 const app = express();
 
-const routes = require('./routes/routes')
+app.use(cors());
 
 // routes
 app.use('/', routes);

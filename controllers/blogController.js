@@ -1,6 +1,6 @@
 const Post = require('../models/post');
 
-// GET all posts
+// GET all posts(published)
 exports.getAllPosts = async function (req, res, next) {
     try {
         // find posts in DB
@@ -15,39 +15,7 @@ exports.getAllPosts = async function (req, res, next) {
 exports.getOnePost = async function (req, res, next) {
     try {
         // find one post
-        res.send('get one post not implemented');
-    }
-    catch (err) {
-        return next(err)
-    }
-};
-
-// Create new post
-exports.createNewPost = async function (req, res, next) {
-    try {
-        // create post and save
-        res.send('create new post not implemented');
-    }
-    catch (err) {
-        return next(err)
-    }
-};
-
-// Update post
-exports.updatePost = async function (req, res, next) {
-    try {
-        // update post
-        res.send('update post not implemented');
-    } catch (err) {
-        return next(err)
-    }
-};
-
-// Delete post
-exports.deletePost = async function (req, res, next) {
-    try {
-        // delete post
-        res.send('delete post not implemented');
+        res.send(`get post ${req.params.postid}`);
     }
     catch (err) {
         return next(err)
