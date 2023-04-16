@@ -6,6 +6,8 @@ const indexController = require('../controllers/indexController');
 const blogController = require('../controllers/blogController');
 const adminController = require('../controllers/adminController');
 
+// ### VIEW ###
+
 // Homepage
 router.get('/', indexController.homepageGet);
 
@@ -31,15 +33,40 @@ router.put('/posts/:postid/:commentid', postController.updateComment);
 router.delete('/posts/:postid/:commentid', postController.deleteComment);
 
 
-//ADMIN
-// Create post
-router.post('/posts', adminController.createNewPost);
+// ### ADMIN ###
 
-// Update post
-router.put('/posts/:postid', adminController.updatePost);
+// GET admin page
+router.get('/admin', adminController.getAdmin);
 
-//Delete post
-router.delete('/posts/:postid', adminController.deletePost);
+// Admin sign up
+router.get('/admin/signup', adminController.getAdminSignup);
+
+router.post('/admin/signup', adminController.adminSignupPost);
+
+// Admin login
+router.get('/admin/login', adminController.getAdminLogin);
+
+router.post('/admin/login', adminController.adminLoginPost);
+
+// Admin logout
+router.get('/admin/logout', adminController.getAdminLogout);
+
+router.post('admin/logout', adminController.adminLogoutPost);
+
+// Secure routes
+// Create blog post
+router.get('/admin/posts', adminController.getNewPost);
+
+router.post('/admin/posts', adminController.createNewPost);
+
+// GET blog post
+router.get('/admin/posts/:postid', postController.getOnePost);
+
+// Update blog post
+router.put('/admin/posts/:postid', adminController.updatePost);
+
+// Delete blog post
+router.delete('/admin/posts/:postid', adminController.deletePost);
 
 // export router
 module.exports = router;
