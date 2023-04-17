@@ -1,10 +1,12 @@
+const { findByIdAndUpdate } = require('../models/admin');
 const Post = require('../models/post');
 
 // GET all posts(published)
 exports.getAllPosts = async function (req, res, next) {
     try {
-        // find posts in DB
-        res.send('get all posts not implemented');
+        // find posts in DB that are published
+        const posts = await Post.find({ published: true });
+        res.json(posts);
     }
     catch (err) {
         return next(err)
@@ -15,7 +17,13 @@ exports.getAllPosts = async function (req, res, next) {
 exports.getOnePost = async function (req, res, next) {
     try {
         // find one post
-        res.send(`get post ${req.params.postid}`);
+        const post = await Post.findById(req.params.postid);
+
+        if (!post) {
+            res.send('post not found');
+        }
+
+        res.json(post);
     }
     catch (err) {
         return next(err)
@@ -26,8 +34,14 @@ exports.getOnePost = async function (req, res, next) {
 // create new comment
 exports.createNewComment = async function (req, res, next) {
     try {
+        // validate and sanitize*
+
         // create new comment
-        res.send('create new comment not implemented yet');
+
+        // errors
+
+        // const result = await Post.findOneAndUpdate({ _id: req.params.postid }, { $push: { comments: comment } })
+        res.send('comment added');
     }
     catch (err) {
         return next(err)
@@ -38,7 +52,10 @@ exports.createNewComment = async function (req, res, next) {
 exports.getComment = async function (req, res, next) {
     try {
         // get comment
-        res.send('get comment not implemented yet');
+        const post = await Post.findById(req.params.postid);
+
+        // send correct comment*
+        res.json(post.comments);
     }
     catch (err) {
         return next(err)
@@ -48,6 +65,8 @@ exports.getComment = async function (req, res, next) {
 // update comment
 exports.updateComment = async function (req, res, next) {
     try {
+        // get get post*
+        // find comment 
         // update comment
         res.send('update comment not implemented yet');
     }
@@ -59,6 +78,8 @@ exports.updateComment = async function (req, res, next) {
 // delete comment
 exports.deleteComment = async function (req, res, next) {
     try {
+        // get post*
+        // find comment
         // delete comment
         res.send('delete comment not implemented yet');
     }
