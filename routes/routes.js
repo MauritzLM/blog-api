@@ -21,22 +21,22 @@ router.get('/posts/:postid', blogController.getOnePost);
 
 // COMMENTS
 // GET specific comment
-router.get('/posts/:postid/:commentid/', postController.getComment);
+router.get('/posts/:postid/:commentid/', blogController.getComment);
 
 // create new comment
-router.post('/posts/:postid', postController.createNewComment);
+router.put('/posts/:postid', blogController.createNewComment);
 
 // edit comment
-router.put('/posts/:postid/:commentid', postController.updateComment);
+router.put('/posts/:postid/:commentid', blogController.updateComment);
 
 // delete comment
-router.delete('/posts/:postid/:commentid', postController.deleteComment);
+router.delete('/posts/:postid/:commentid', blogController.deleteComment);
 
 
 // ### ADMIN ###
 
 // GET admin page
-router.get('/admin', adminController.getAdmin);
+router.get('/admin', adminController.getAdminPage);
 
 // Admin sign up
 router.get('/admin/signup', adminController.getAdminSignup);
@@ -60,7 +60,7 @@ router.get('/admin/posts', adminController.getNewPost);
 router.post('/admin/posts', adminController.createNewPost);
 
 // GET blog post
-router.get('/admin/posts/:postid', postController.getOnePost);
+router.get('/admin/posts/:postid', blogController.getOnePost);
 
 // Update blog post
 router.put('/admin/posts/:postid', adminController.updatePost);
