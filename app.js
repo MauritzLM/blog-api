@@ -2,9 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const passport = require('passport');
-
-// authentication srategy* jwt
 
 require('dotenv').config()
 // Connect DB
@@ -25,12 +22,10 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-
 // routes
 const routes = require('./routes/routes');
-app.use('/', routes);
 
-// Plug in the JWT strategy as a middleware so only verified users can access this route.*
+app.use('/', routes);
 
 
 app.listen(3000, () => {
