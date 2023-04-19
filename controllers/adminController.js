@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const auth = require('../auth/auth');
 const { body, validationResult } = require('express-validator');
 
+
 require('dotenv').config()
 
 // GET admin page ?
@@ -38,14 +39,20 @@ exports.adminSignupPost = [
         .trim()
         .isLength({ min: 2 })
         .escape(),
-    body('password', 'min length 8')
+    body('password', 'password must be at least 8 characters')
         .trim()
         .isLength({ min: 8 })
         .escape(),
     body('email', 'please enter a valid email')
         .trim()
         .isEmail(),
-    body('secret', 'enter correct secret')
+    body('admincode', 'enter correct code')
+        .custom(value => {
+            if (value !== process.env.admin_code) {
+                throw new Error('Wrong Answer!');
+            }
+            return true;
+        })
         .trim()
         .escape(),
     async function (req, res, next) {
@@ -61,11 +68,12 @@ exports.adminSignupPost = [
 
             // errors
             if (!errors.isEmpty()) {
-                res.json({ errors: errors.array() })
+                res.json({ errors: errors.array() });
+                return;
             }
 
             // const result = await admin.save();
-            res.send('admin created');
+            res.json('admin created');
         }
         catch (err) {
             return next(err);
@@ -93,35 +101,27 @@ exports.adminLoginPost = [
             // login admin
             // authenticate using username and password
             const { username, password } = req.body;
-            const admin = await Admin.findOne({ username: 'Mo' })
+            const admin = await Admin.findOne({ username: username })
 
             if (!admin) {
-                res.json('admin not found');
+                res.json({ msg: 'admin not found' });
+                return;
             }
 
             // validate password
-            // const validate = await bcrypt.compare('odoylerules', admin.password);
+            const validate = await bcrypt.compare(password, admin.password);
 
-            // if (!validate) {
-            //     res.json('incorrect password');
-            // }
+            if (!validate) {
+                res.json({ msg: 'incorrect password' });
+                return;
+            }
 
             // sign jwt and return it
-            const payload = {
-                admin: {
-                    id: admin._id,
-                },
-            };
+            const token = await auth.generateToken(res, admin._id, admin.username)
 
-            jwt.sign(
-                payload,
-                process.env.JWT_SECRET,
-                { expiresIn: 360000 },
-                (err, token) => {
-                    if (err) throw err;
-                    res.json({ token });
-                }
-            )
+            res.json({ msg: 'login successful' })
+
+
         }
         catch (err) {
             res.json(err);
@@ -153,11 +153,11 @@ exports.adminLogoutPost = async function (req, res, next) {
 // ### Blog posts ###
 
 // GET new blog post page
-exports.getNewPost = [auth.verify,
+exports.getNewPost = [auth.verifyToken,
 async function (req, res, next) {
     try {
         // send info to create new post
-        res.send('create post info');
+        res.json({ msg: 'create post info' });
     }
     catch (err) {
         return next(err);
@@ -165,7 +165,7 @@ async function (req, res, next) {
 }];
 
 // Create new blog post
-exports.createNewPost = [auth.verify,
+exports.createNewPost = [auth.verifyToken,
 async function (req, res, next) {
     try {
 
