@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require('../auth/auth');
 const { body, validationResult } = require('express-validator');
+const multer = require('multer');
 
 
 require('dotenv').config()
@@ -34,6 +35,7 @@ exports.getAdminSignup = async function (req, res, next) {
 
 // Sign up POST
 exports.adminSignupPost = [
+    multer().none(),
     // validate and sanitize
     body('username', 'Please enter a username')
         .trim()
@@ -49,7 +51,7 @@ exports.adminSignupPost = [
     body('admincode', 'enter correct code')
         .custom(value => {
             if (value !== process.env.admin_code) {
-                throw new Error('Wrong Answer!');
+                throw new Error('Wrong Code!');
             }
             return true;
         })
@@ -65,6 +67,8 @@ exports.adminSignupPost = [
                 password: req.body.password,
                 email: req.body.email
             });
+
+            // check if admin already exists*
 
             // errors
             if (!errors.isEmpty()) {

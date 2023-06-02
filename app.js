@@ -1,8 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
+// const bodyParser = require('body-parser');
+// const formidableMiddleware = require('express-formidable');
+// const multer = require('multer');
+
 
 require('dotenv').config()
 // Connect DB
@@ -21,9 +24,11 @@ db.on("error", console.error.bind(console, "mongo connection error"));
 const app = express();
 
 app.use(cors());
-app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+// app.use(formidableMiddleware());
+
 
 // routes
 const routes = require('./routes/routes');
@@ -31,7 +36,7 @@ const routes = require('./routes/routes');
 app.use('/', routes);
 
 
-app.listen(3000, () => {
-    console.log('listening on port 3000')
+app.listen(3001, () => {
+    console.log('listening on port 3001')
 });
 
