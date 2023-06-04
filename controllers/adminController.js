@@ -60,24 +60,38 @@ exports.adminSignupPost = [
     async function (req, res, next) {
         try {
             const errors = validationResult(req);
-            // take info and create admin
-
-            const admin = new Admin({
-                username: req.body.username,
-                password: req.body.password,
-                email: req.body.email
-            });
-
-            // check if admin already exists*
-
             // errors
             if (!errors.isEmpty()) {
                 res.json({ errors: errors.array() });
                 return;
             }
 
-            // const result = await admin.save();
-            res.json('admin created');
+            // take info and create admin
+            const { username, password, email } = req.body;
+
+            const admin = new Admin({
+                username: username,
+                password: password,
+                email: email
+            });
+
+            // check if admin already exists*
+            const usernameFound = await Admin.findOne({ username: username });
+
+            const emailFound = await Admin.findOne({ email: email });
+
+            if (usernameFound) {
+                res.json("username already in use");
+                return;
+
+            } else if (emailFound) {
+                res.json("email already in use");
+                return;
+
+            } else {
+                // const result = await admin.save();
+                res.json('admin created');
+            }
         }
         catch (err) {
             return next(err);
@@ -105,7 +119,7 @@ exports.adminLoginPost = [
             // login admin
             // authenticate using username and password
             const { username, password } = req.body;
-            const admin = await Admin.findOne({ username: username })
+            const admin = await Admin.findOne({ username: username });
 
             if (!admin) {
                 res.json({ msg: 'admin not found' });
