@@ -10,28 +10,7 @@ const multer = require('multer');
 
 require('dotenv').config()
 
-// GET admin page ?
-exports.getAdminPage = async function (req, res, next) {
-    try {
-        // display admin page
-        res.send('admin page')
-    }
-    catch (err) {
-        return next(err);
-    }
-};
-
 // ### Sign up, Login, Logout ###
-
-// Sign up GET ?
-exports.getAdminSignup = async function (req, res, next) {
-    try {
-        res.send('admin sign up page')
-    }
-    catch (err) {
-        return next(err);
-    }
-};
 
 // Sign up POST
 exports.adminSignupPost = [
@@ -98,19 +77,10 @@ exports.adminSignupPost = [
         }
     }];
 
-// Login GET ?
-exports.getAdminLogin = async function (req, res, next) {
-    try {
-        // send login page info
-        res.json('admin login')
-    }
-    catch (err) {
-        return next(err);
-    }
-};
 
 // Login POST
 exports.adminLoginPost = [
+    multer().none(),
     // validate / sanitize
     body('username').trim(),
     body('password').trim(),
@@ -122,7 +92,7 @@ exports.adminLoginPost = [
             const admin = await Admin.findOne({ username: username });
 
             if (!admin) {
-                res.json({ msg: 'admin not found' });
+                res.json({ authenticated: false, msg: 'admin not found' });
                 return;
             }
 
@@ -130,14 +100,14 @@ exports.adminLoginPost = [
             const validate = await bcrypt.compare(password, admin.password);
 
             if (!validate) {
-                res.json({ msg: 'incorrect password' });
+                res.json({ authenticated: false, msg: 'incorrect password' });
                 return;
             }
 
             // sign jwt and return it
-            const token = await auth.generateToken(res, admin._id, admin.username)
+            const jwtToken = await auth.generateToken(res, admin._id, admin.username);
 
-            res.json({ msg: 'login successful' })
+            res.json({ authenticated: true, msg: 'logged in!' });
 
 
         }
@@ -147,7 +117,7 @@ exports.adminLoginPost = [
         }
     }];
 
-// Logout GET ?
+// Logout GET 
 exports.getAdminLogout = async function (req, res, next) {
     try {
         // Get logout page    
@@ -170,40 +140,48 @@ exports.adminLogoutPost = async function (req, res, next) {
 
 // ### Blog posts ###
 
-// GET new blog post page
-exports.getNewPost = [auth.verifyToken,
-async function (req, res, next) {
-    try {
-        // send info to create new post
-        res.json({ msg: 'create post info' });
-    }
-    catch (err) {
-        return next(err);
-    }
-}];
+// add async to wait for verify function*
 
 // Create new blog post
-exports.createNewPost = [auth.verifyToken,
-async function (req, res, next) {
-    try {
+exports.createNewPost = [
+    // verify credentials
+    auth.verifyToken,
+    multer().none(),
 
-        // create post and save*
-        const post = new Post({
-            title: req.body.title,
-            author: req.body.author,
-            body: req.body.content,
-            date: Date.now(),
-            published: req.body.published,
-            comments: []
-        });
+    // validate and sanitize
+    body("title", "please add a title").notEmpty().trim(),
+    body("author", "please add an author").notEmpty().trim(),
+    body("postContent", "gonna need some content").notEmpty().trim(),
 
-        // const result = await post.save();
-        res.send('post created');
-    }
-    catch (err) {
-        return next(err)
-    }
-}];
+    async function (req, res, next) {
+        try {
+
+            const errors = validationResult(req);
+            // errors
+            if (!errors.isEmpty()) {
+                res.json({ errors: errors.array() });
+                return;
+            }
+
+            const { title, author, postContent } = req.body;
+            // create post and save*
+            const post = new Post({
+                title: title,
+                author: author,
+                body: postContent,
+                date: Date.now(),
+                published: false,
+                comments: []
+            });
+
+            // save post to db
+            const result = await post.save();
+            res.json('post created');
+        }
+        catch (err) {
+            return next(err)
+        }
+    }];
 
 // Update blog post
 exports.updatePost = async function (req, res, next) {
