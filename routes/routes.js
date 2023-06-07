@@ -9,7 +9,7 @@ const adminController = require('../controllers/adminController');
 // ### VIEW ###
 
 // Homepage
-router.get('/', indexController.homepageGet);
+
 
 // POSTS view
 //GET all posts
@@ -36,15 +36,12 @@ router.delete('/posts/:postid/:commentid', blogController.deleteComment);
 // ### ADMIN ###
 
 // GET admin page
-router.get('/admin', adminController.getAdminPage);
 
 // Admin sign up
-router.get('/admin/signup', adminController.getAdminSignup);
 
 router.post('/admin/signup', adminController.adminSignupPost);
 
 // Admin login
-router.get('/admin/login', adminController.getAdminLogin);
 
 router.post('/admin/login', adminController.adminLoginPost);
 
@@ -55,9 +52,8 @@ router.post('admin/logout', adminController.adminLogoutPost);
 
 // Secure routes
 // Create blog post
-router.get('/admin/posts', adminController.getNewPost);
 
-router.post('/admin/posts', adminController.createNewPost);
+router.post('/admin/posts/new', adminController.createNewPost);
 
 // GET blog post
 router.get('/admin/posts/:postid', blogController.getOnePost);
