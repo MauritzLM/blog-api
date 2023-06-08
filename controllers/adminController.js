@@ -140,7 +140,21 @@ exports.adminLogoutPost = async function (req, res, next) {
 
 // ### Blog posts ###
 
-// add async to wait for verify function*
+// GET all posts
+exports.getAllPosts = [
+    auth.verifyToken,
+    multer().none(),
+
+    async function (req, res, next) {
+        try {
+            const posts = await Post.find({});
+
+            res.json(posts);
+
+        } catch (error) {
+            res.json('connection error')
+        }
+    }];
 
 // Create new blog post
 exports.createNewPost = [
