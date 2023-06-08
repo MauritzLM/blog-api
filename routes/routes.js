@@ -55,6 +55,8 @@ router.post('admin/logout', adminController.adminLogoutPost);
 
 router.post('/admin/posts/new', adminController.createNewPost);
 
+// GET all posts
+router.get('/admin/posts', adminController.getAllPosts);
 // GET blog post
 router.get('/admin/posts/:postid', blogController.getOnePost);
 
