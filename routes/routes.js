@@ -57,11 +57,12 @@ router.post('/admin/posts/new', adminController.createNewPost);
 
 // GET all posts
 router.get('/admin/posts', adminController.getAllPosts);
+
 // GET blog post
-router.get('/admin/posts/:postid', blogController.getOnePost);
+router.get('/admin/posts/:postid', adminController.getOnePost);
 
 // Update blog post
-router.put('/admin/posts/:postid', adminController.updatePost);
+router.post('/admin/posts/:postid', adminController.updatePost);
 
 // Delete blog post
 router.delete('/admin/posts/:postid', adminController.deletePost);
