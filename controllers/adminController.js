@@ -140,6 +140,26 @@ exports.adminLogoutPost = async function (req, res, next) {
 
 // ### Blog posts ###
 
+// get post to edit
+exports.getOnePost = [
+    auth.verifyToken,
+    multer().none(),
+    async function (req, res, next) {
+        try {
+            // find one post
+            const post = await Post.findById(req.params.postid);
+
+            if (!post) {
+                res.json('post not found');
+            }
+
+            res.json(post);
+        }
+        catch (err) {
+            return next(err)
+        }
+    }];
+
 // GET all posts
 exports.getAllPosts = [
     auth.verifyToken,
@@ -178,7 +198,7 @@ exports.createNewPost = [
             }
 
             const { title, author, postContent } = req.body;
-            // create post and save*
+            // create post and save
             const post = new Post({
                 title: title,
                 author: author,
@@ -198,16 +218,32 @@ exports.createNewPost = [
     }];
 
 // Update blog post
-exports.updatePost = async function (req, res, next) {
-    try {
-        // validate / sanitize ?
-        // update post
-        res.send('update post not implemented');
-    }
-    catch (err) {
-        return next(err)
-    }
-};
+exports.updatePost = [
+    // verify credentials
+    auth.verifyToken,
+    multer().none(),
+
+    // validate and sanitize
+    body("title", "please add a title").notEmpty().trim(),
+    body("author", "please add an author").notEmpty().trim(),
+    body("postContent", "gonna need some content").notEmpty().trim(),
+    async function (req, res, next) {
+        try {
+
+            const errors = validationResult(req);
+            // errors
+            if (!errors.isEmpty()) {
+                res.json({ errors: errors.array() });
+                return;
+            }
+
+            // find by id and update post*
+            res.json('update post not implemented');
+        }
+        catch (err) {
+            return next(err)
+        }
+    }];
 
 // Delete blog post
 exports.deletePost = async function (req, res, next) {
