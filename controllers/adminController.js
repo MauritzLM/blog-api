@@ -237,8 +237,27 @@ exports.updatePost = [
                 return;
             }
 
-            // find by id and update post*
-            res.json('update post not implemented');
+            // destructure variables
+            const { title, author, postContent, publish } = req.body;
+
+            // get old post
+            const oldPost = await Post.findById(req.params.postid);
+
+
+            // create new post with same id
+            const updatedPost = new Post({
+                ...oldPost,
+                title: title,
+                author: author,
+                body: postContent,
+                published: publish === 'on' ? true : false,
+                _id: req.params.postid // same id
+            });
+
+            // find by id and update post
+            const result = await Post.findByIdAndUpdate(req.params.postid, updatedPost, {});
+
+            res.json(result);
         }
         catch (err) {
             return next(err)
