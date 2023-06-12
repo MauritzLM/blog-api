@@ -67,5 +67,12 @@ router.post('/admin/posts/:postid', adminController.updatePost);
 // Delete blog post
 router.delete('/admin/posts/:postid', adminController.deletePost);
 
+// Comments
+// GET all comments
+router.get('/admin/posts/:postid/comments', adminController.getAllComments);
+
+// POST new comment
+router.post('/admin/posts/:postid/comments', adminController.createNewComment);
+
 // export router
 module.exports = router;
