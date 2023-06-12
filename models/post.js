@@ -8,7 +8,9 @@ const postSchema = new Schema({
     body: { type: String, required: true },
     date: { type: Date, required: true },
     published: { type: Boolean, required: true },
-    comments: [{ _id: Number, author: String, body: String, timestamp: Date }]
+    comments: []
 });
 
 module.exports = mongoose.model('Post', postSchema);
+
+// { _id: Number, author: String, body: String, timestamp: Date } (comment structure)
