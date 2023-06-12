@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const auth = require('../auth/auth');
 const { body, validationResult } = require('express-validator');
 const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
 
 
 require('dotenv').config()
@@ -72,8 +73,8 @@ exports.adminSignupPost = [
                 res.json('admin created');
             }
         }
-        catch (err) {
-            return next(err);
+        catch (error) {
+            return next(error);
         }
     }];
 
@@ -111,9 +112,9 @@ exports.adminLoginPost = [
 
 
         }
-        catch (err) {
-            res.json(err);
-            return next(err);
+        catch (error) {
+            res.json(error);
+            return next(error);
         }
     }];
 
@@ -122,8 +123,8 @@ exports.getAdminLogout = async function (req, res, next) {
     try {
         // Get logout page    
     }
-    catch (err) {
-        return next(err);
+    catch (error) {
+        return next(error);
     }
 };
 
@@ -133,8 +134,8 @@ exports.adminLogoutPost = async function (req, res, next) {
         // Logout admin    
         // forget / remove token?
     }
-    catch (err) {
-        return next(err);
+    catch (error) {
+        return next(error);
     }
 };
 
@@ -155,8 +156,8 @@ exports.getOnePost = [
 
             res.json(post);
         }
-        catch (err) {
-            return next(err)
+        catch (error) {
+            return next(error)
         }
     }];
 
@@ -172,7 +173,7 @@ exports.getAllPosts = [
             res.json(posts);
 
         } catch (error) {
-            res.json('connection error')
+            res.json('connection error');
         }
     }];
 
@@ -212,8 +213,8 @@ exports.createNewPost = [
             const result = await post.save();
             res.json('post created');
         }
-        catch (err) {
-            return next(err)
+        catch (error) {
+            return next(error)
         }
     }];
 
@@ -229,9 +230,9 @@ exports.updatePost = [
     body("postContent", "gonna need some content").notEmpty().trim(),
     async function (req, res, next) {
         try {
-
-            const errors = validationResult(req);
             // errors
+            const errors = validationResult(req);
+
             if (!errors.isEmpty()) {
                 res.json({ errors: errors.array() });
                 return;
@@ -259,8 +260,8 @@ exports.updatePost = [
 
             res.json(result);
         }
-        catch (err) {
-            return next(err)
+        catch (error) {
+            return next(error)
         }
     }];
 
@@ -270,7 +271,75 @@ exports.deletePost = async function (req, res, next) {
         // find post and remove*
         res.send('delete post not implemented');
     }
-    catch (err) {
-        return next(err)
+    catch (error) {
+        return next(error);
     }
 };
+
+// ### post comments
+// GET all comments for post*
+exports.getAllComments = [
+    auth.verifyToken,
+    multer().none(),
+
+    async function (req, res, next) {
+        try {
+            // find post by id
+            const post = await Post.findById(req.params.postid, "title author comments");
+
+            if (!post) {
+                res.json("post not found!")
+            };
+
+            // send comments array
+            res.json(post);
+
+        }
+        catch (error) {
+            return next(err);
+        }
+    }
+];
+
+// POST new comment
+exports.createNewComment = [
+    // verify credentials
+    auth.verifyToken,
+    multer().none(),
+    body("commentAuthor", "please add an author").notEmpty().trim(),
+    body("commentBody", "please add a valid comment").isLength({ min: 2 }).trim(),
+
+    async function (req, res, next) {
+        try {
+            // errors
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                res.json({ errors: errors.array() });
+                return;
+            }
+
+            const { commentAuthor, commentBody } = req.body;
+
+            // create new comment object
+            const newComment = {
+                _id: uuidv4(),
+                author: commentAuthor + ' ' + 'ADMIN',
+                body: commentBody,
+                timestamp: new Date(),
+            };
+
+            //find post and update(add comment to comments array)
+            const result = await Post.findByIdAndUpdate(req.params.postid, { $push: { comments: newComment } }, {});
+            res.send(result);
+        }
+        catch (error) {
+            return next(error);
+        }
+    }
+];
+
+// Update comment*
+
+
+// Delete comment*
