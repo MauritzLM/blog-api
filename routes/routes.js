@@ -74,5 +74,8 @@ router.get('/admin/posts/:postid/comments', adminController.getAllComments);
 // POST new comment
 router.post('/admin/posts/:postid/comments', adminController.createNewComment);
 
+// update comment
+router.post('/admin/posts/:postid/comments/:commentid', adminController.updateComment);
+
 // export router
 module.exports = router;
