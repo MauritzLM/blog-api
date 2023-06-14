@@ -11,6 +11,7 @@ const postSchema = new Schema({
     comments: []
 });
 
+
 module.exports = mongoose.model('Post', postSchema);
 
 // { _id: Number, author: String, body: String, timestamp: Date } (comment structure)
