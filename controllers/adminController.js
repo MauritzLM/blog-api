@@ -8,7 +8,6 @@ const { body, validationResult } = require('express-validator');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 
-
 require('dotenv').config()
 
 // ### Sign up, Login, Logout ###
@@ -151,7 +150,7 @@ exports.getOnePost = [
             const post = await Post.findById(req.params.postid);
 
             if (!post) {
-                res.json('post not found');
+                res.json({ error: 'post not found' });
             }
 
             res.json(post);
@@ -204,7 +203,7 @@ exports.createNewPost = [
                 title: title,
                 author: author,
                 body: postContent,
-                date: Date.now(),
+                date: new Date(),
                 published: false,
                 comments: []
             });
@@ -277,7 +276,7 @@ exports.deletePost = async function (req, res, next) {
 };
 
 // ### post comments
-// GET all comments for post*
+// GET all comments for post* (necessary?)
 exports.getAllComments = [
     auth.verifyToken,
     multer().none(),
@@ -339,7 +338,40 @@ exports.createNewComment = [
     }
 ];
 
-// Update comment*
+// Update comment
+exports.updateComment = [
+    // verify credentials
+    auth.verifyToken,
+    multer().none(),
+    body("commentAuthor", "please add an author").notEmpty().trim(),
+    body("commentBody", "please add a valid comment").isLength({ min: 2 }).trim(),
+
+    async function (req, res, next) {
+        try {
+            // errors
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                res.json({ errors: errors.array() });
+                return;
+            }
+
+            const { commentAuthor, commentBody } = req.body;
+
+            // find comment of post and update fields
+            const result = await Post.updateOne(
+                { _id: req.params.postid, "comments._id": req.params.commentid },
+                { $set: { "comments.$.author": commentAuthor, "comments.$.body": commentBody } }
+            );
+
+            res.json(result);
+        }
+        catch (error) {
+            return next(error);
+        }
+    }
+];
 
 
 // Delete comment*
+exports.removeComment = [];
