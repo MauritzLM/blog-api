@@ -1,4 +1,4 @@
-const { findByIdAndUpdate } = require('../models/admin');
+
 const Post = require('../models/post');
 
 // GET all posts(published)
