@@ -10,7 +10,7 @@ const { v4: uuidv4 } = require('uuid');
 
 require('dotenv').config()
 
-// ### Sign up, Login, Logout ###
+// ### SIGN UP, LOGIN, LOGOUT ###
 
 // Sign up POST
 exports.adminSignupPost = [
@@ -138,7 +138,7 @@ exports.adminLogoutPost = async function (req, res, next) {
     }
 };
 
-// ### Blog posts ###
+// ### BLOG POSTS ###
 
 // get post to edit
 exports.getOnePost = [
@@ -268,15 +268,16 @@ exports.updatePost = [
 exports.deletePost = async function (req, res, next) {
     try {
         // find post and remove*
-        res.send('delete post not implemented');
+        res.json('delete post not implemented');
     }
     catch (error) {
         return next(error);
     }
 };
 
-// ### post comments
-// GET all comments for post* (necessary?)
+// ### POST COMMENT ###
+
+// GET all comments for post
 exports.getAllComments = [
     auth.verifyToken,
     multer().none(),
@@ -291,7 +292,7 @@ exports.getAllComments = [
             };
 
             // send comments array
-            res.json(post);
+            res.json(post.comments);
 
         }
         catch (error) {
@@ -358,7 +359,7 @@ exports.updateComment = [
 
             const { commentAuthor, commentBody } = req.body;
 
-            // find comment of post and update fields
+            // find comment of post and update comment fields
             const result = await Post.updateOne(
                 { _id: req.params.postid, "comments._id": req.params.commentid },
                 { $set: { "comments.$.author": commentAuthor, "comments.$.body": commentBody } }
@@ -373,5 +374,37 @@ exports.updateComment = [
 ];
 
 
-// Delete comment*
-exports.removeComment = [];
+// Delete comment
+exports.removeComment = [
+    // verify credentials
+    auth.verifyToken,
+    multer().none(),
+    body("admincode", "incorrect code").custom(value => {
+        if (value !== process.env.admin_code) {
+            throw new Error('Wrong Code!');
+        }
+        return true;
+    })
+        .trim()
+        .escape(),
+    async function (req, res, next) {
+        try {
+            const errors = validationResult(req);
+            // validation errors
+            if (!errors.isEmpty()) {
+                res.json({ errors: errors.array() });
+                return;
+            };
+
+            // find comment of post and remove from array
+            const result = await Post.updateOne(
+                { _id: req.params.postid }, { $pull: { comments: { _id: req.params.commentid } } }
+            );
+
+            res.json(result);
+        }
+        catch (error) {
+            return next(error);
+        }
+    }
+];

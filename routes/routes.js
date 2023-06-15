@@ -10,7 +10,6 @@ const adminController = require('../controllers/adminController');
 
 // Homepage
 
-
 // POSTS view
 //GET all posts
 router.get('/posts', blogController.getAllPosts);
@@ -50,7 +49,8 @@ router.get('/admin/logout', adminController.getAdminLogout);
 
 router.post('admin/logout', adminController.adminLogoutPost);
 
-// Secure routes
+// SECURE ROUTES
+
 // Create blog post
 
 router.post('/admin/posts/new', adminController.createNewPost);
@@ -67,7 +67,8 @@ router.post('/admin/posts/:postid', adminController.updatePost);
 // Delete blog post
 router.delete('/admin/posts/:postid', adminController.deletePost);
 
-// Comments
+// COMMENTS
+
 // GET all comments
 router.get('/admin/posts/:postid/comments', adminController.getAllComments);
 
@@ -76,6 +77,9 @@ router.post('/admin/posts/:postid/comments', adminController.createNewComment);
 
 // update comment
 router.post('/admin/posts/:postid/comments/:commentid', adminController.updateComment);
+
+// delete comment
+router.post('/admin/posts/:postid/comments/:commentid/delete', adminController.removeComment);
 
 // export router
 module.exports = router;
