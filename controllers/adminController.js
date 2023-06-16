@@ -264,16 +264,36 @@ exports.updatePost = [
         }
     }];
 
-// Delete blog post
-exports.deletePost = async function (req, res, next) {
-    try {
-        // find post and remove*
-        res.json('delete post not implemented');
-    }
-    catch (error) {
-        return next(error);
-    }
-};
+// Delete blog post*
+exports.deletePost = [
+    // verify credentials
+    auth.verifyToken,
+    multer().none(),
+    body("admincode", "incorrect code").custom(value => {
+        if (value !== process.env.admin_code) {
+            throw new Error('Wrong Code!');
+        }
+        return true;
+    })
+        .trim()
+        .escape(),
+    async function (req, res, next) {
+        try {
+            // errors
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                res.json({ errors: errors.array() });
+                return;
+            };
+            // find post and remove
+            const result = await Post.findByIdAndRemove(req.params.postid);
+            res.json(result);
+        }
+        catch (error) {
+            return next(error);
+        }
+    }];
 
 // ### POST COMMENT ###
 
