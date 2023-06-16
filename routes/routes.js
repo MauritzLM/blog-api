@@ -65,7 +65,7 @@ router.get('/admin/posts/:postid', adminController.getOnePost);
 router.post('/admin/posts/:postid', adminController.updatePost);
 
 // Delete blog post
-router.delete('/admin/posts/:postid', adminController.deletePost);
+router.post('/admin/posts/:postid/delete', adminController.deletePost);
 
 // COMMENTS
 
