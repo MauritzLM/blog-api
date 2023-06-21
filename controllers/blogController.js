@@ -1,5 +1,8 @@
 
 const Post = require('../models/post');
+const { body, validationResult } = require('express-validator');
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
 
 // GET all posts(published)
 exports.getAllPosts = async function (req, res, next) {
@@ -20,33 +23,73 @@ exports.getOnePost = async function (req, res, next) {
         const post = await Post.findById(req.params.postid);
 
         if (!post) {
-            res.send('post not found');
+            res.json({ error: 'post not found' });
         }
 
         res.json(post);
     }
-    catch (err) {
-        return next(err)
+    catch (error) {
+        return next(error)
+    }
+};
+
+// GET most recent posts*
+exports.getRecentPosts = async function (req, res, next) {
+    try {
+        const posts = await Post.find({ published: true }).limit(5).sort({ date: -1 });
+
+        // if(!posts) {
+        //     res.json("")
+        // }
+
+        res.json(posts);
+
+    } catch (error) {
+        return next(error)
     }
 };
 
 // COMMENTS
-// create new comment
-exports.createNewComment = async function (req, res, next) {
-    try {
-        // validate and sanitize*
+// create new comment (add some check)*
+exports.createNewComment = [
+    multer().none(),
+    // validate and sanitize
+    body("commentAuthor", "please enter your name")
+        .trim()
+        .isLength({ min: 2 })
+        .escape(),
+    body("commentBody", "comment must be at least 10 characters long")
+        .trim()
+        .isLength({ min: 10 })
+        .escape(),
+    async function (req, res, next) {
+        try {
+            // errors
+            const errors = validationResult(req);
 
-        // create new comment
+            if (!errors.isEmpty()) {
+                res.json({ errors: errors.array() });
+                return;
+            }
 
-        // errors
+            const { commentAuthor, commentBody } = req.body;
 
-        // const result = await Post.findOneAndUpdate({ _id: req.params.postid }, { $push: { comments: comment } })
-        res.send('comment added');
-    }
-    catch (err) {
-        return next(err)
-    }
-};
+            const newComment = {
+                _id: uuidv4(),
+                author: commentAuthor,
+                body: commentBody,
+                timestamp: new Date()
+            }
+
+            // create new comment
+            const result = await Post.findByIdAndUpdate(req.params.postid, { $push: { comments: newComment } }, {});
+
+            res.json(result);
+        }
+        catch (err) {
+            return next(err)
+        }
+    }];
 
 // GET a comment
 exports.getComment = async function (req, res, next) {
