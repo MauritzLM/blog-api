@@ -17,13 +17,16 @@ router.get('/posts', blogController.getAllPosts);
 // GET specific post
 router.get('/posts/:postid', blogController.getOnePost);
 
+// GET recent posts
+router.get('/recentposts', blogController.getRecentPosts);
+
 
 // COMMENTS
 // GET specific comment
 router.get('/posts/:postid/:commentid/', blogController.getComment);
 
 // create new comment
-router.put('/posts/:postid', blogController.createNewComment);
+router.post('/posts/:postid', blogController.createNewComment);
 
 // edit comment
 router.put('/posts/:postid/:commentid', blogController.updateComment);
