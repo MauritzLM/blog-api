@@ -50,7 +50,7 @@ exports.getRecentPosts = async function (req, res, next) {
 };
 
 // COMMENTS
-// create new comment (add some check)*
+// create new comment 
 exports.createNewComment = [
     multer().none(),
     // validate and sanitize
@@ -61,6 +61,14 @@ exports.createNewComment = [
     body("commentBody", "comment must be at least 10 characters long")
         .trim()
         .isLength({ min: 10 })
+        .escape(),
+    body("securityQuestion", "Wrong answer!").custom(value => {
+        if (value !== "5") {
+            throw new Error('Wrong answer!');
+        }
+        return true;
+    })
+        .trim()
         .escape(),
     async function (req, res, next) {
         try {
